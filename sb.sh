@@ -38,7 +38,7 @@ initials()
 	if [ $check1 != 0 ]
 	then
 		echo -e "'mokutil' is not installed. Please install the program 'sudo apt install mokutil'" 2>&1| tee -a $HOME/bin/Sys_log
-	exit_codec
+	exit_code
 	fi
 }
 
@@ -53,7 +53,7 @@ exit_code()
 create_ssl()
 {
 	read -p "Enter your country name : " country
-	country=$(bash country.sh "$country")
+	country=$(bash country.sh "$country" iso)
 	read -p "Enter State or province (1 -128 characters) : " state
 	read -p "Enter Locality (1-128 characters) : " locale
 	read -p "Do you want to add an organisation name? (y/n) (default will be nan) : " ans1
@@ -63,7 +63,35 @@ create_ssl()
 	else
 		org="nan" 
 	fi
-	echo $(cat sslinfo.txt) > $HOME/bin/openssl.cnf
+	export country
+	export state
+	export locale
+	export org
+	envsubst < sslinfo.txt > $HOME/bin/openssl.cnf
+	unset country
+	unset state
+	unset locale
+	unset org
+}
+
+enroll_mok()
+{
+	openssl req -config $HOME/bin/openssl.cnf \
+	-new -x509 -newkey rsa:2048 \
+	-nodes -days 36500 -outform DER \
+	-keyout "$HOME/bin/RTLMOK.priv" \
+	-out "$HOME/bin/RTLMOK.der"
+
+	sudo mokutil --import $HOME/bin/RTLMOK.der
+}
+
+sign_modules()
+{
+	export PRIVK=$HOME/bin/RTLMOK.priv
+	export DERK=$HOME/bin/RTLMOK.der
+	find . -name "*.ko" -exec sudo /usr/src/linux-headers-$(uname -r)/scripts/sign-file sha512 $PRIVK $DERK {} \;
+	unset PRIVK
+	unset DERK
 }
 
 
@@ -72,5 +100,6 @@ sudo_login
 initials
 create_ssl
 exit_code
+enroll_mok
 ##############################################################################################
 
