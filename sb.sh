@@ -38,7 +38,7 @@ initials()
 	if [ $check1 != 0 ]
 	then
 		echo -e "'mokutil' is not installed. Please install the program 'sudo apt install mokutil'" 2>&1| tee -a $HOME/bin/Sys_log
-	exit_code
+	exit_codec
 	fi
 }
 
@@ -53,16 +53,17 @@ exit_code()
 create_ssl()
 {
 	read -p "Enter your country name : " country
+	country=$(bash country.sh "$country")
 	read -p "Enter State or province (1 -128 characters) : " state
-	read -p "Enter Locality (1-128 characters)" locale
+	read -p "Enter Locality (1-128 characters) : " locale
 	read -p "Do you want to add an organisation name? (y/n) (default will be nan) : " ans1
-	if [ $ans1 == 'y' -p $ans1 == 'Y' ]
+	if [ $ans1 == 'y' -o $ans1 == 'Y' ]
 	then
 		read -p "Enter your organisation name : " org 
 	else
 		org="nan" 
 	fi
-	echo $(cat sslinfo.txt) >> $HOME/bin/openssl.cnf
+	echo $(cat sslinfo.txt) > $HOME/bin/openssl.cnf
 }
 
 

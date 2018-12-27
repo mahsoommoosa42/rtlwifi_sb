@@ -326,15 +326,15 @@ case $termlen in
         #  doing nothing, so size zero file.
 
      2) if [ $arg2 = 'iso' ] ; then 
-           awk -F@ "\$1 ~ /^$term/ {print \$2}" $tmpf 
+           awk -F@ "\$1 ~ /$term/ {print \$2}" $tmpf 
         else
-           awk -F@ "\$1 ~ /^$term/ {print \$3}" $tmpf 
+           awk -F@ "\$1 ~ /$term/ {print \$3}" $tmpf 
         fi                                   > $outf  ;;
 
      3) if [ $arg2 = 'iso' ] ; then 
-           awk -F@ "\$3 ~ /^$term/ {print \$1}" $tmpf 
+           awk -F@ "\$3 ~ /$term/ {print \$1}" $tmpf 
         else
-           awk -F@ "\$3 ~ /^$term/ {print \$2}" $tmpf 
+           awk -F@ "\$3 ~ /$term/ {print \$2}" $tmpf 
         fi                                   > $outf  ;;
 
      *) if [ $arg2 = 'iso' ] ; then 
@@ -353,7 +353,7 @@ if [ -s  $outf ] ; then
      cat $outf
      rm -f  $tmpf  $outf
 else
-     echo " !!  country: NULL response; check arguments and data."  1>&2
+     echo "N"  1>&2
      rm -f  $tmpf  $outf
      exit 113
 fi
