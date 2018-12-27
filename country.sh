@@ -326,21 +326,21 @@ case $termlen in
         #  doing nothing, so size zero file.
 
      2) if [ $arg2 = 'iso' ] ; then 
-           awk -F@ "\$1 ~ /$term/ {print \$2}" $tmpf 
+           awk -F@ "\$1 ~ /^$term/ {print \$2}" $tmpf 
         else
-           awk -F@ "\$1 ~ /$term/ {print \$3}" $tmpf 
+           awk -F@ "\$1 ~ /^$term/ {print \$3}" $tmpf 
         fi                                   > $outf  ;;
 
      3) if [ $arg2 = 'iso' ] ; then 
-           awk -F@ "\$3 ~ /$term/ {print \$1}" $tmpf 
+           awk -F@ "\$3 ~ /^$term/ {print \$1}" $tmpf 
         else
-           awk -F@ "\$3 ~ /$term/ {print \$2}" $tmpf 
+           awk -F@ "\$3 ~ /^$term/ {print \$2}" $tmpf 
         fi                                   > $outf  ;;
 
      *) if [ $arg2 = 'iso' ] ; then 
-           awk -F@ "\$2 ~ /$term/ {print \$1}" $tmpf 
+           awk -F@ "\$2 ~ /^$term/ {print \$1}" $tmpf 
         else
-           awk -F@ "\$2 ~ /$term/ {print \$3}" $tmpf 
+           awk -F@ "\$2 ~ /^$term/ {print \$3}" $tmpf 
         fi                                   > $outf  ;;
 
 esac

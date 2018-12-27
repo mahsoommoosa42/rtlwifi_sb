@@ -52,15 +52,7 @@ exit_code()
 ##Creating SSL Config File
 create_ssl()
 {
-	echo "Enter your Country Code in 2-LETTER ISO 3166 (refer https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes) : "
-	for I in 1 2 3 4 5
-	do
-		read country
-		if ( ${#country} == 2)
-		then
-			break
-		fi
-	done
+	read -p "Enter your country name : " country
 	read -p "Enter State or province (1 -128 characters) : " state
 	read -p "Enter Locality (1-128 characters)" locale
 	read -p "Do you want to add an organisation name? (y/n) (default will be nan) : " ans1
