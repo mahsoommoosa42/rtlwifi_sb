@@ -52,33 +52,25 @@ exit_code()
 ##Creating SSL Config File
 create_ssl()
 {
-	echo "Enter your Name : "
-	read name;
-	echo \
-	"# This definition stops the following lines choking if HOME isn't
-	# defined.
-	HOME                    = .
-	RANDFILE                = $ENV::HOME/.rnd 
-	[ req ]
-	distinguished_name      = req_distinguished_name
-	x509_extensions         = v3
-	string_mask             = utf8only
-	prompt                  = no
-
-	[ req_distinguished_name ]
-	countryName             = CA
-	stateOrProvinceName     = Quebec
-	localityName            = Montreal
-	0.organizationName      = cyphermox
-	commonName              = Secure Boot Signing
-	emailAddress            = example@example.com
-
-	[ v3 ]
-	subjectKeyIdentifier    = hash
-	authorityKeyIdentifier  = keyid:always,issuer
-	basicConstraints        = critical,CA:FALSE
-	extendedKeyUsage        = codeSigning,1.3.6.1.4.1.311.10.3.6,1.3.6.1.4.1.2312.16.1.2
-	nsComment               = \"OpenSSL Generated Certificate\"" | tee -a openssl.cnf
+	echo "Enter your Country Code in 2-LETTER ISO 3166 (refer https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes) : "
+	for I in 1 2 3 4 5
+	do
+		read country
+		if ( ${#country} == 2)
+		then
+			break
+		fi
+	done
+	read -p "Enter State or province (1 -128 characters) : " state
+	read -p "Enter Locality (1-128 characters)" locale
+	read -p "Do you want to add an organisation name? (y/n) (default will be nan) : " ans1
+	if [ $ans1 == 'y' -p $ans1 == 'Y' ]
+	then
+		read -p "Enter your organisation name : " org 
+	else
+		org="nan" 
+	fi
+	echo $(cat sslinfo.txt) >> $HOME/bin/openssl.cnf
 }
 
 
