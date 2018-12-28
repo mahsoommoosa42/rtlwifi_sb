@@ -71,33 +71,72 @@ create_ssl()
 	export state
 	export locale
 	export org
-	envsubst < sslinfo.txt > $HOME/bin/openssl.cnf
+	envsubst < sslinfo.txt > $HOME/bin/openssl.cnf 2>&1 | tee -a $HOME/bin/Sys_log
+	if [ $? != 0 ]
+	then
+		echo -e "ERROR : Failed to create file. \n$HOME/bin/Sys_log for detailed log";
+		exit_code
+	fi
+	echo -e "OpenSSL Config file created at $HOME/bin" 2>&1 | tee -a $HOME/bin/Sys_log
 	unset country
 	unset state
 	unset locale
 	unset org
-}
 
-enroll_mok()
-{
 	openssl req -config $HOME/bin/openssl.cnf \
 	-new -x509 -newkey rsa:2048 \
 	-nodes -days 36500 -outform DER \
 	-keyout "$HOME/bin/RTLMOK.priv" \
-	-out "$HOME/bin/RTLMOK.der"
-
-	sudo mokutil --import $HOME/bin/RTLMOK.der
+	-out "$HOME/bin/RTLMOK.der" 2>&1 | tee -a $HOME/bin/Sys_log
+	if [ $? != 0 ]
+	then
+		echo -e "Error : Failed to create private key and signature file. Check $HOME/bin/Sys_log for detailed log";
+		exit_code
+	fi
+	echo -e "Private Key and Signature File created at $HOME/bin"
 }
+
+
+#######################Enrolling Key into MOK#################################################
+
+enroll_mok()
+{
+	sudo mokutil --import $HOME/bin/RTLMOK.der 2>&1 | tee -a $HOME/bin/Sys_log
+	if [ $? != 0 ]
+	then
+		echo -e "Failed to import key to MOK. Check $HOME/bin/Sys_log for detailed log\n"
+		exit_code
+	fi
+	echo -e "Key Succesfully enrolled into MOK" 2>&1 | tee -a $HOME/bin/Sys_log
+}
+
+
+########################## Signing Modules with necessary key ##################################
 
 sign_modules()
 {
 	export PRIVK=$HOME/bin/RTLMOK.priv
 	export DERK=$HOME/bin/RTLMOK.der
 	export DIR=/lib/modules/$(uname -r)/kernel/drivers/net/wireless/realtek/rtlwifi
-	find $DIR -name "*.ko" -exec sudo /usr/src/linux-headers-$(uname -r)/scripts/sign-file sha512 $PRIVK $DERK {} \;
+	find $DIR -name "*.ko" -exec sudo /usr/src/linux-headers-$(uname -r)/scripts/sign-file sha512 $PRIVK $DERK {} \; >> $HOME/bin/Sys_log 2>&1
+	if [ $? != 0]
+	then
+		echo -e "\n\n Unable to sign modules. Check $HOMe/bin/Sys_log for detailed log"
+		exit_code
+	fi
+	echo -e "\n\n Modules successfully signed. Do you want to reboot? (y/n)"
 	unset PRIVK
 	unset DERK
 	unset DIR
+	read ans
+	if [ $ans == 'y' -o $ans == 'Y' ]
+	then
+		reboot
+	else
+		echo -e "Don't forget to reboot manually"
+	fi
+	echo -e "\n Upon reboot, you will enter a blue screen (MokManager). \nUse the screen to select 'Enroll MOK' and follow the menus to finish the enrolling process"	
+	exit_code
 }
 
 
@@ -105,8 +144,8 @@ sign_modules()
 sudo_login
 initials
 create_ssl
-exit_code
 enroll_mok
 sign_modules
+exit_code
 ##############################################################################################
 
