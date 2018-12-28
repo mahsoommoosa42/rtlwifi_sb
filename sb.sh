@@ -54,8 +54,11 @@ create_ssl()
 {
 	read -p "Enter your country name : " country
 	country=$(bash country.sh "$country" iso)
+	echo -e "\n\n------------------------------------------------------------------------------\n\nCountry : $country\n" >> $HOME/bin/Sys_log 2>&1
 	read -p "Enter State or province (1 -128 characters) : " state
+	echo -e "State : $state" >> $HOME/bin/Sys_log 2>&1
 	read -p "Enter Locality (1-128 characters) : " locale
+	echo -e "Locality : $locale" >> $HOME/bin/Sys_log 2>&1
 	read -p "Do you want to add an organisation name? (y/n) (default will be nan) : " ans1
 	if [ $ans1 == 'y' -o $ans1 == 'Y' ]
 	then
@@ -63,6 +66,7 @@ create_ssl()
 	else
 		org="nan" 
 	fi
+	echo "Organisation Name : $org" >> $HOME/bin/Sys_log 2>&1
 	export country
 	export state
 	export locale
@@ -103,5 +107,6 @@ initials
 create_ssl
 exit_code
 enroll_mok
+sign_modules
 ##############################################################################################
 
