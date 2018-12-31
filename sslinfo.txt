@@ -14,7 +14,7 @@ stateOrProvinceName     = $state
 localityName            = $locale
 0.organizationName      = $org
 commonName              = Secure Boot Signing
-emailAddress            = example@example.com
+emailAddress            = $email
 
 [ v3 ]
 subjectKeyIdentifier    = hash

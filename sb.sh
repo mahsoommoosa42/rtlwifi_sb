@@ -54,6 +54,10 @@ create_ssl()
 {
 	read -p "Enter your country name : " country
 	country=$(bash country.sh "$country" iso)
+	if [ $country == "N" ]
+	then
+		$country == X1
+	fi
 	echo -e "\n\n------------------------------------------------------------------------------\n\nCountry : $country\n" >> $HOME/bin/Sys_log 2>&1
 	read -p "Enter State or province (1 -128 characters) : " state
 	echo -e "State : $state" >> $HOME/bin/Sys_log 2>&1
@@ -67,10 +71,13 @@ create_ssl()
 		org="nan" 
 	fi
 	echo "Organisation Name : $org" >> $HOME/bin/Sys_log 2>&1
+	read -p "Enter your email address : " email
+	echo "Email : $email" >> $HOME/bin/Sys_log 2>&1
 	export country
 	export state
 	export locale
 	export org
+	export email
 	envsubst < sslinfo.txt > $HOME/bin/openssl.cnf 2>&1 | tee -a $HOME/bin/Sys_log
 	if [ $? != 0 ]
 	then
@@ -82,6 +89,7 @@ create_ssl()
 	unset state
 	unset locale
 	unset org
+	unset email
 
 	openssl req -config $HOME/bin/openssl.cnf \
 	-new -x509 -newkey rsa:2048 \
