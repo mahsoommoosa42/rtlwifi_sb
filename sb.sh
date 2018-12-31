@@ -125,7 +125,8 @@ sign_modules()
 {
 	export PRIVK=$HOME/bin/RTLMOK.priv
 	export DERK=$HOME/bin/RTLMOK.der
-	export DIR=/lib/modules/$(uname -r)/kernel/drivers/net/wireless/realtek/rtlwifi
+	#export DIR=/lib/modules/$(uname -r)/kernel/drivers/net/wireless/realtek/rtlwifi
+	export DIR=$(dirname $(dirname $(modinfo -n rtl8723be)))
 	find $DIR -name "*.ko" -exec sudo /usr/src/linux-headers-$(uname -r)/scripts/sign-file sha512 $PRIVK $DERK {} \; >> $HOME/bin/Sys_log 2>&1
 	if [ $? != 0]
 	then
